@@ -1,4 +1,4 @@
-package KMean;
+package kMean;
 
 public class KMean {
 	private double[] data;

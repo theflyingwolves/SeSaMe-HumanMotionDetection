@@ -1,4 +1,4 @@
-package BipartiteMatching;
+package bipartiteMatching;
 
 import java.util.ArrayList;
 import java.util.Iterator;

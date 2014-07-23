@@ -1,4 +1,4 @@
-package KMean;
+package kMean;
 
 public class TwoMeanThresholdSelector {
 	private KMean kMean;

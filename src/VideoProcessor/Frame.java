@@ -1,15 +1,16 @@
-package VideoProcessor;
+package videoProcessor;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import majorDirectionAnalyzer.MajorDirectionAnalyzer;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 
-import MajorDirectionAnalyzer.MajorDirectionAnalyzer;
 import MotionDetectionUtility.MeanVarianceAccumulator;
 import MotionDetectionUtility.Utility;
 import MotionDetectionUtility.Vector;

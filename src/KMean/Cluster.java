@@ -1,4 +1,4 @@
-package KMean;
+package kMean;
 
 import java.util.ArrayList;
 

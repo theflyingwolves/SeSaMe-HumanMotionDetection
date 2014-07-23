@@ -1,4 +1,4 @@
-package BipartiteMatching;
+package bipartiteMatching;
 
 public class Edge<GType> {
 	private GType node1;

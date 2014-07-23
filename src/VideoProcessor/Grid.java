@@ -1,4 +1,4 @@
-package VideoProcessor;
+package videoProcessor;
 
 import java.util.ArrayList;
 

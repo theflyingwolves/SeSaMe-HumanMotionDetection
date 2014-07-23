@@ -1,4 +1,4 @@
-package MajorDirectionAnalyzer;
+package majorDirectionAnalyzer;
 
 import static org.junit.Assert.*;
 

@@ -2,7 +2,7 @@ package DataStructure;
 
 import java.util.ArrayList;
 
-import VideoProcessor.Grid;
+import videoProcessor.Grid;
 
 public class StingLayers {
 	private ArrayList<Grid> sting;

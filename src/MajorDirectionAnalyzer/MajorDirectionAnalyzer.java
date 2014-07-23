@@ -1,4 +1,4 @@
-package MajorDirectionAnalyzer;
+package majorDirectionAnalyzer;
 
 import java.util.ArrayList;
 import java.util.Collections;

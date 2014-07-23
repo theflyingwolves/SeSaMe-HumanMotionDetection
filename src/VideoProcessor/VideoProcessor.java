@@ -1,4 +1,4 @@
-package VideoProcessor;
+package videoProcessor;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import kMean.KMean;
+import kMean.TwoMeanThresholdSelector;
+
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -16,17 +19,15 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import bipartiteMatching.Edge;
+import bipartiteMatching.HungarianMatch;
 import scatterPlotter.ScatterPlot;
-import BipartiteMatching.Edge;
-import BipartiteMatching.HungarianMatch;
+import thresholdAnalyzer.DynamicThresholdSelector;
 import DataStructure.BufferQueue;
-import KMean.KMean;
-import KMean.TwoMeanThresholdSelector;
 import MotionDetectionUtility.DisplayWindow;
 import MotionDetectionUtility.MeanVarianceAccumulator;
 import MotionDetectionUtility.Utility;
 import MotionDetectionUtility.Vector;
-import ThresholdAnalyzer.DynamicThresholdSelector;
 
 public class VideoProcessor {
 	private final int BUFFER_SIZE = 2;

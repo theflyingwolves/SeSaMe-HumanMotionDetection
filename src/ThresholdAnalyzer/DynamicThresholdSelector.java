@@ -1,4 +1,4 @@
-package ThresholdAnalyzer;
+package thresholdAnalyzer;
 
 public class DynamicThresholdSelector {
 	private double percentile;
