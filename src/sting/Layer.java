@@ -1,25 +1,64 @@
 package sting;
 
+import java.util.ArrayList;
+
+import sting.CellType.CellT;
+
 public class Layer {
-	private Cell[][] cells;
+	private CellType[][] cells;
 	private int unitLength;
 	
-	public Layer(int unitLength,Cell[][] dataCells){
+	public Layer(int unitLength, CellType[][] dataCells){
 		this.unitLength = unitLength;
 		this.cells = dataCells;
 	}
 	
-	public Cell[][][] groupAdjacentCells(){
+	public Cell[] getActiveCells(){
+		ArrayList<Cell> activeCellsInArray = new ArrayList<Cell>();
+		for(int i=0;i<cells.length;i++){
+			for(int j=0;j<cells[0].length;j++){
+				CellType ct = cells[i][j];
+				if(ct.getType() == CellT.Cell){
+					activeCellsInArray.add((Cell)ct);
+				}else{
+					activeCellsInArray.addAll(getActiveCellsInCellGroup((CellGroup)ct));
+				}
+			}
+		}
+		
+		Cell[] activeCells = new Cell[activeCellsInArray.size()];
+		for(int i = 0; i < activeCellsInArray.size(); i++){
+			activeCells[i] = activeCellsInArray.get(i);
+		}
+		
+		return activeCells;
+	}
+	
+	private ArrayList<Cell> getActiveCellsInCellGroup(CellGroup cg){
+		ArrayList<Cell> activeCells = new ArrayList<Cell>();
+		CellType[] frontiers = cg.getFrontiers();
+		for(CellType ct : frontiers){
+			if(ct.getType() == CellT.Cell){
+				activeCells.add((Cell)ct);
+			}else{
+				ArrayList<Cell> subActiveCells = getActiveCellsInCellGroup((CellGroup)ct);
+				activeCells.addAll(subActiveCells);
+			}
+		}
+		
+		return activeCells;
+	}
+	
+	public CellType[][][] groupAdjacentCells(){
 		int numOfGroupsPerRow = (int) Math.ceil((double)cells.length / this.unitLength);
 		int numOfGroupsPerCol = (int) Math.ceil((double)cells[0].length / this.unitLength);
 		int numOfCellsPerGroup = this.unitLength * this.unitLength;
-		Cell[][][] cellsInGroups = new Cell[numOfGroupsPerRow][numOfGroupsPerCol][numOfCellsPerGroup];
+		CellType[][][] cellsInGroups = new CellType[numOfGroupsPerRow][numOfGroupsPerCol][numOfCellsPerGroup];
 		for(int x = 0; x < cells.length; x+=this.unitLength){
 			for(int y = 0; y < cells[0].length; y+=this.unitLength){
 				for(int offsetX = 0; offsetX < this.unitLength; offsetX ++){
 					for(int offsetY = 0; offsetY < this.unitLength; offsetY ++){
 						if(x+offsetX < cells.length && y+offsetY < cells[0].length){
-//							System.out.println("Row "+x/this.unitLength+" Col "+y/this.unitLength+" Index "+(offsetX*this.unitLength+offsetY)+": "+(x+offsetX)+" and "+(y+offsetY));
 							cellsInGroups[x/this.unitLength][y/this.unitLength][offsetX*this.unitLength+offsetY] = 
 								cells[x+offsetX][y+offsetY];
 						}
@@ -27,53 +66,88 @@ public class Layer {
 				}
 			}
 		}
-		
 		return cellsInGroups;
 	}
 	
 	public Layer layerWisePropagate(){
-		Cell[][][] cellsInGroups = groupAdjacentCells();
-		Cell[][] updatedCells = new Cell[cellsInGroups.length][cellsInGroups[0].length];
-		Cell combinedCell = null;
-		for(int i=0; i< cellsInGroups.length;i++){
-			for(int j=0; j<cellsInGroups[0].length;j++){
-				for(int k=0;k<cellsInGroups[0][0].length;k++){
-					Cell cellToProcess = cellsInGroups[i][j][k];
-					if(cellToProcess != null){
-						if(k==0){
-							combinedCell = cellToProcess;
-						}else{
-							combinedCell = combinedCell.combine(cellToProcess);
-						}
-						cellToProcess.deactivateCell();
-					}
-				}
+		CellType[][][] cellGroups = groupAdjacentCells();
+		CellType[][] updatedCells = new CellType[cellGroups.length][cellGroups[0].length];
+		CellType combinedCell = null;
+		CellType[] cellsInGroup;
+		
+		for(int i=0; i< cellGroups.length;i++){
+			for(int j=0; j<cellGroups[0].length;j++){
+				cellsInGroup = cellGroups[i][j];
+				combinedCell = combineAll(cellsInGroup);
 				updatedCells[i][j] = combinedCell;
 			}
 		}
 		
-		Layer updatedLayer = new Layer(this.unitLength,updatedCells);
+		Layer updatedLayer = new Layer(unitLength, updatedCells);
 		return updatedLayer;
 	}
-
-	public Layer cellLevelPropagate(){
-		Cell[][][] cellsInGroups = groupAdjacentCells();
-		return null;
+	
+	private CellType combineAll(CellType[] cellsToCombine){
+		boolean isCombinable = testCombinability(cellsToCombine);
+		boolean shouldCombine = shouldCombineCells(cellsToCombine);
+		if(isCombinable && shouldCombine){
+			Cell combinedCell = null;
+			for(CellType c : cellsToCombine){
+				if(c!=null){
+					Cell cell = (Cell)c;
+					if(combinedCell == null){
+						combinedCell = cell;
+					}else{
+						combinedCell = combinedCell.combineWith(cell);
+					}
+				}
+			}
+			return combinedCell;
+		}else{
+			CellGroup cellsInGroup = new CellGroup(cellsToCombine);
+			return cellsInGroup;
+		}
 	}
 	
-	public Cell[][] getCells(){
-		return this.cells;
+	private boolean shouldCombineCells(CellType[] cells){
+		Combinable[] props = getCombinablePropertiesFromCells(cells);
+		if(props != null){
+			return props[0].shouldPropagate(props);
+		}else{
+			return false;
+		}
 	}
 	
-//	public static void main(String[] args){
-//		Cell[][] dataCells = new Cell[5][5];
-//		for(int i=0;i<dataCells.length;i++){
-//			for(int j=0;j<dataCells[0].length;j++){
-//				dataCells[i][j] = new Cell(i,j);
-//			}
-//		}
-//		
-//		Layer layer = new Layer(3,dataCells);
-//		layer.groupAdjacentCells();
-//	}
+	private boolean testCombinability(CellType[] cells){
+		boolean flag = true;
+		
+		for(CellType c : cells){
+			if(c != null && c.getType() == CellT.CellGroup){
+				flag = false;
+				break;
+			}
+		}
+		return flag;
+	}
+	
+	private Combinable[] getCombinablePropertiesFromCells(CellType[] cells){
+		Combinable[] props = new Combinable[cells.length];
+		boolean flag = true;
+		
+		for(int i=0;i<cells.length;i++){
+			if(cells[i]!=null &&cells[i].getType()!=CellT.CellGroup){
+				Cell c = (Cell)cells[i];
+				props[i] = c.getProperty();
+			}else{
+				flag = false;
+				break;
+			}
+		}
+		
+		if(flag){
+			return props;
+		}else{
+			return null;
+		}
+	}
 }

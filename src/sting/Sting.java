@@ -5,11 +5,9 @@ import java.util.ArrayList;
 public class Sting {
 	private ArrayList<Layer> layers;
 	private final int unitLength;
-	private boolean shouldForceLayerWisePropagate;
 	
-	public Sting(Cell[][] dataCells, int unitLength, boolean shouldForceLayerWisePropagate){	
+	public Sting(Cell[][] dataCells, int unitLength){	
 		this.unitLength = unitLength;
-		this.shouldForceLayerWisePropagate = shouldForceLayerWisePropagate;
 		initWithDataCells(dataCells);
 	}
 	
@@ -20,14 +18,6 @@ public class Sting {
 	}
 	
 	public void execute(){
-		if(this.shouldForceLayerWisePropagate){
-			executeLayerWisePropagate();
-		}else{
-			executeCellLevelPropagate();
-		}
-	}
-	
-	private void executeLayerWisePropagate(){
 		Layer topLayer = getTopLayer();
 		Layer upperLayer = topLayer.layerWisePropagate();
 		layers.add(upperLayer);
@@ -38,18 +28,8 @@ public class Sting {
 		return layers.get(index);
 	}
 	
-	public Cell[][] getActiveCells(){
-		if(this.shouldForceLayerWisePropagate){
-			Layer topLayer = getTopLayer();
-			return topLayer.getCells();
-		}else{
-			return null;
-		}
-	}
-	
-	private void executeCellLevelPropagate(){
+	public Cell[] getActiveCells(){
 		Layer topLayer = getTopLayer();
-		Layer upperLayer = topLayer.cellLevelPropagate();
-		layers.add(upperLayer);
+		return topLayer.getActiveCells();
 	}
 }

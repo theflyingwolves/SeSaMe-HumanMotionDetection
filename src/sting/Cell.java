@@ -1,51 +1,46 @@
 package sting;
 
 public class Cell implements CellType{
-	private int level;
 	private boolean isActive;
 	private Combinable property;
 	
-	public Cell(Combinable property){
-		this.property = property;
-		this.isActive = true;
+	public Cell(Combinable prop){
+		property = prop;
+		isActive = true;
 	}
 	
-	public boolean isCellAtSameLevel(Cell cell){
-		return level == cell.getLevelNumber();
+	public Cell combineWith(Cell c){
+		Combinable combinedProperty = property.combineWith(c.getProperty());
+		return new Cell(combinedProperty);
 	}
 	
-	public int getLevelNumber(){
-		return level;
+	public Combinable getProperty(){
+		return property;
 	}
 	
-	public void deactivateCell(){
-		this.isActive = false;
-	}
-	
-	public boolean isCellActive(){
+	@Override
+	public boolean isActive() {
 		return isActive;
 	}
 	
-	public Combinable getCombinableProperty(){
-		return this.property;
+	@Override
+	public CellType[] getFrontiers() {
+		CellType[] frontiers = new CellType[1];
+		frontiers[0] = this;
+		return frontiers;
 	}
-	
-	public Cell combine(Cell[] cells){
-		Combinable[] combinableProps = new Combinable[cells.length];
-		for(int i=0; i<cells.length; i++){
-			combinableProps[i] = cells[i].getCombinableProperty();
-		}
-		
-		Combinable combinedProperty = this.property.combineWith(combinableProps);
-		return new Cell(combinedProperty);
+
+	@Override
+	public CellT getType() {
+		return CellT.Cell;
 	}
-	
-	public Cell combine(Cell cell){
-		Combinable combinedProperty = this.property.combineWith(cell.getCombinableProperty());
-		return new Cell(combinedProperty);
+
+	@Override
+	public void deactivate() {
+		isActive = false;
 	}
 	
 	public String toString(){
-		return this.property.toString();
+		return property.toString();
 	}
 }

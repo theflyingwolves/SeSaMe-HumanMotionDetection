@@ -1,6 +1,6 @@
 package sting;
 
-public class STINGTest {
+public class StingTest {
 	public static class Significance extends Combinable {
 		private float significance;
 		
@@ -28,13 +28,30 @@ public class STINGTest {
 
 		@Override
 		public boolean shouldPropagate(Combinable[] objs) {
-			// TODO Auto-generated method stub
-			return true;
+			boolean flag = true;
+			int sum = 0;
+			Significance sig;
+			
+			for(Combinable c : objs){
+				if(!(c instanceof Significance)){
+					flag = false;
+					break;
+				}else{				
+					sig = (Significance)c;
+					sum += sig.getSignificance();
+				}
+			}
+			
+			if(flag){
+				return sum < 50;
+			}else{
+				return false;
+			}
 		}
 	}
 	
 	public static void main(String[] args){
-		Cell[][] cells = new Cell[18][18];
+		Cell[][] cells = new Cell[4][4];
 		int counter = 0;
 		for(int i=0; i<cells.length;i++){
 			for(int j=0; j<cells[0].length; j++){
@@ -44,12 +61,29 @@ public class STINGTest {
 			}
 		}
 		System.out.println("Counter: "+counter);
-		Sting sting = new Sting(cells,4,true);
+		
+		Sting sting = new Sting(cells,2);
+		
+		printStingInfo(sting);
+		
 		sting.execute();
+		printStingInfo(sting);
+		
 		sting.execute();
-//		sting.execute();
-//		sting.execute();
-		Cell[][] activeCells = sting.getActiveCells();
-		System.out.println("Row: "+activeCells.length +" Columns: "+activeCells[0].length+" Data:"+activeCells[0][0]);
+		printStingInfo(sting);
+		
+		sting.execute();
+		printStingInfo(sting);
+		
+		sting.execute();
+		printStingInfo(sting);
+	}
+	
+	private static void printStingInfo(Sting sting){
+		Cell[] activeCells = sting.getActiveCells();
+		System.out.println("Number of Cells Left: "+activeCells.length);
+		for(Cell c : activeCells){
+			System.out.println("Cell Content: "+c);
+		}
 	}
 }
